@@ -164,13 +164,6 @@ void GLWidget::paintGL()
 {
   glClearColor(1.0, 1.0, 1.0, 1.0);
   glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-
-  //glm::mat4 r_mat = glm::rotate(glm::mat4(1.0f), 15.0f, glm::vec3(0.0f, 0.0f, 1.0f));
-  //GLuint location = glGetUniformLocation(_program, "rotation_matrix");
-  //if(location >= 0)
-  //{
-  //  glUniformMatrix4fv(location, 1, GL_FALSE, glm::value_ptr(r_mat));
-  //}
   
   glBindVertexArray(_vao);
   glDrawArrays(GL_TRIANGLES, 0, 6);
