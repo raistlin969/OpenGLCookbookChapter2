@@ -59,6 +59,15 @@
     <ClCompile Include="VboTorus.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="GLWidgetADS.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Debug\moc_GLWidgetADS.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="GeneratedFiles\Release\moc_GLWidgetADS.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="GLWidget.h">
@@ -69,6 +78,9 @@
     </CustomBuild>
     <CustomBuild Include="GLWidget.qrc">
       <Filter>Resource Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="GLWidgetADS.h">
+      <Filter>Header Files</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
