@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'GLWidget.ui'
 **
-** Created: Mon Sep 10 17:31:13 2012
+** Created: Mon Sep 10 17:56:31 2012
 **      by: Qt User Interface Compiler version 4.8.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
