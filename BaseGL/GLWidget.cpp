@@ -54,104 +54,10 @@ void GLWidget::initializeGL()
   connect(_timer, SIGNAL(timeout()), this, SLOT(Idle()));
   _timer->start(0);
 
-  if(!_program.CompileShaderFromFile("simple_vertex.glsl", GLSLShader::VERTEX))
-  {
-    BOOST_LOG_SEV(_log, error) << "Vertex Shader failed\n" << _program.Log() << std::endl << "Hit any key to exit";
-    char c;
-    std::cin >> c;
-    exit(1);
-  }
-  if(!_program.CompileShaderFromFile("simple_frag.glsl", GLSLShader::FRAGMENT))
-  {
-    BOOST_LOG_SEV(_log, error) << "Fragment Shader failed\n" << _program.Log() << std::endl << "Hit any key to exit";
-    char c;
-    std::cin >> c;
-    exit(1);
-  }
+  _model = glm::mat4(1.0f);
+  _view = glm::lookAt(vec3(0.0f, 0.0f, 2.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
+  _projection = mat4(1.0f);
 
-  if(!_program.Link())
-  {
-    BOOST_LOG_SEV(_log, error) << "Program failed to link\n" << _program.Log() << std::endl << "Hit any key to exit";
-    char c;
-    std::cin >> c;
-    exit(1);
-  }
-
-  _program.Use();
-  _program.PrintActiveAttribs();
-  _program.PrintActiveUniforms();
-
-  GLuint block_index = glGetUniformBlockIndex(_program.Handle(), "BlobSettings");
-  GLint block_size;
-  glGetActiveUniformBlockiv(_program.Handle(), block_index, GL_UNIFORM_BLOCK_DATA_SIZE, &block_size);
-  GLubyte* block_buffer = new GLubyte[block_size];
-  const GLchar* names[] = {"inner_color", "outer_color", "inner_radius", "outer_radius"};
-  GLuint indices[4];
-  glGetUniformIndices(_program.Handle(), 4, names, indices);
-
-  GLint offset[4];
-  glGetActiveUniformsiv(_program.Handle(), 4, indices, GL_UNIFORM_OFFSET, offset);
-
-  GLfloat outer_color[] = {0.0f, 0.0f, 0.0f, 0.0f};
-  GLfloat inner_color[] = {1.0f, 1.0f, 0.75f, 1.0f};
-  GLfloat inner_radius = 0.25f, outer_radius = 0.45f;
-
-  memcpy(block_buffer + offset[0], inner_color, 4 * sizeof(GLfloat));
-  memcpy(block_buffer + offset[1], outer_color, 4 * sizeof(GLfloat));
-  memcpy(block_buffer + offset[2], &inner_radius, sizeof(GLfloat));
-  memcpy(block_buffer + offset[3], &outer_radius, sizeof(GLfloat));
-
-  GLuint ubo;
-  glGenBuffers(1, &ubo);
-  glBindBuffer(GL_UNIFORM_BUFFER, ubo);
-  glBufferData(GL_UNIFORM_BUFFER, block_size, block_buffer, GL_DYNAMIC_DRAW);
-  glBindBufferBase(GL_UNIFORM_BUFFER, block_index, ubo);
-
-  float pos_data[] = 
-  {
-    -0.8f, -0.8f, 0.0f,
-    0.8f, 0.8f, 0.0f,
-    -0.8f, 0.8f, 0.0f,
-
-    -0.8f, -0.8f, 0.0f,
-    0.8f, -0.8f, 0.0f,
-    0.8f, 0.8f, 0.0f
-  };
-  float tex_data[] = 
-  {
-    0.0f, 0.0f,
-    1.0f, 1.0f,
-    0.0f, 1.0f,
-
-    0.0f, 0.0f,
-    1.0f, 0.0f, 
-    1.0f, 1.0f
-  };
-
-  GLuint vbo[2];
-  glGenBuffers(2, vbo);
-  GLuint pos_buffer = vbo[0];
-  GLuint tex_buffer = vbo[1];
-
-  glBindBuffer(GL_ARRAY_BUFFER, pos_buffer);
-  glBufferData(GL_ARRAY_BUFFER, 18 * sizeof(float), pos_data, GL_STATIC_DRAW);
-
-  glBindBuffer(GL_ARRAY_BUFFER, tex_buffer);
-  glBufferData(GL_ARRAY_BUFFER, 12 * sizeof(float), tex_data, GL_STATIC_DRAW);
-
-  glGenVertexArrays(1, &_vao);
-  glBindVertexArray(_vao);
-
-  glEnableVertexAttribArray(0);
-  glEnableVertexAttribArray(1);
-
-  glBindBuffer(GL_ARRAY_BUFFER, pos_buffer);
-  glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-
-  glBindBuffer(GL_ARRAY_BUFFER, tex_buffer);
-  glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, NULL);
-
-  _program.PrintActiveUniforms();
 }
 
 void GLWidget::resizeGL( int w, int h )
@@ -162,11 +68,8 @@ void GLWidget::resizeGL( int w, int h )
 
 void GLWidget::paintGL()
 {
-  glClearColor(1.0, 1.0, 1.0, 1.0);
+  glClearColor(0.0, 0.0, 0.0, 1.0);
   glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
-  
-  glBindVertexArray(_vao);
-  glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
 void GLWidget::keyPressEvent( QKeyEvent* e )
@@ -194,4 +97,48 @@ GLWidget::~GLWidget()
 void GLWidget::Idle()
 {
   updateGL();
+}
+
+void GLWidget::CompileAndLinkShaders()
+{
+  //first do vertex files
+  for(ShaderFiles::iterator it = _vertex_shader_files.begin(); it != _vertex_shader_files.end(); ++it)
+  {
+    if(!_program.CompileShaderFromFile(it->c_str(), GLSLShader::VERTEX))
+    {
+      BOOST_LOG_SEV(_log, error) << "Vertex Shader " << it->c_str() << " failed\n" << _program.Log() << std::endl << "Hit any key to exit";
+      char c;
+      std::cin >> c;
+      exit(1);
+    }
+  }
+  //fragment
+  for(ShaderFiles::iterator it = _fragment_shader_files.begin(); it != _fragment_shader_files.end(); ++it)
+  {
+    if(!_program.CompileShaderFromFile(it->c_str(), GLSLShader::FRAGMENT))
+    {
+      BOOST_LOG_SEV(_log, error) << "Fragment Shader " << it->c_str() << " failed\n" << _program.Log() << std::endl << "Hit any key to exit";
+      char c;
+      std::cin >> c;
+      exit(1);
+    }
+  }
+  if(!_program.Link())
+  {
+    BOOST_LOG_SEV(_log, error) << "Program failed to link\n" << _program.Log() << std::endl << "Hit any key to exit";
+    char c;
+    std::cin >> c;
+    exit(1);
+  }
+  _program.Use();
+  _program.PrintActiveAttribs();
+  _program.PrintActiveUniforms();
+
+}
+
+void GLWidget::SetMatrices()
+{
+  glm::mat4 mv = _view * _model;
+  _program.SetUniform("model_view_matrix", mv);
+  _program.SetUniform("mvp_matrix", _projection * mv);
 }

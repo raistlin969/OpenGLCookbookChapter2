@@ -9,6 +9,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <boost/log/trivial.hpp>
+#include <vector>
+#include <string>
 #include "Logger.h"
 #include "GLSLProgram.h"
 
@@ -22,6 +24,7 @@ public:
 protected:
   typedef void (APIENTRY *_glGenVertexArrays) (GLsizei, GLuint*);
   typedef void (APIENTRY *_glBindVertexArray) (GLuint);
+  typedef std::vector<string> ShaderFiles;
 
 protected:
   virtual void initializeGL();
@@ -33,17 +36,25 @@ protected:
 protected:
   void FreeResources();
   void DumpGLInfo(bool dump_extentions = false);
+  virtual void SetMatrices();
+  virtual void CompileAndLinkShaders();
 
 protected slots:
   void Idle();
 
-private:
+protected:
   QTimer* _timer;
   QElapsedTimer _elapsed;
-  GLint _mvp;
+
   GLuint _vao;
 
   GLSLProgram _program;
+  glm::mat4 _model;
+  glm::mat4 _view;
+  glm::mat4 _projection;
+
+  ShaderFiles _vertex_shader_files;
+  ShaderFiles _fragment_shader_files;
 
   boost::log::sources::severity_logger<severity_level>& _log;
 
