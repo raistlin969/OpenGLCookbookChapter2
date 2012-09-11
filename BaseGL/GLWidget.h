@@ -27,20 +27,21 @@ protected:
   typedef std::vector<string> ShaderFiles;
 
 protected:
+  //Qt functions
   virtual void initializeGL();
   virtual void resizeGL(int w, int h);
   virtual void paintGL();
-
   virtual void keyPressEvent(QKeyEvent* e);
   
-protected:
-  void FreeResources();
-  void DumpGLInfo(bool dump_extentions = false);
+  virtual void FreeResources();
   virtual void SetMatrices();
   virtual void CompileAndLinkShaders();
+  
+protected:
+  void DumpGLInfo(bool dump_extentions = false);
 
 protected slots:
-  void Idle();
+  virtual void Idle();
 
 protected:
   QTimer* _timer;
