@@ -1,4 +1,4 @@
-#include "GLWidgetADS.h"
+#include "GLWidgetText.h"
 #include <QtGui/QApplication>
 
 #include <Windows.h>
@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
   glFormat.setDepth(true);
  
     // Create a GLWidget requesting our format
-  GLWidgetADS w( glFormat );    
+  GLWidgetText w( glFormat );    
   w.setMinimumWidth(800);
   w.setMinimumHeight(600);
   w.show();

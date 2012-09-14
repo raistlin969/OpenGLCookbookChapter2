@@ -17,6 +17,10 @@ protected:
   virtual void paintGL();
   virtual void SetMatrices();
 
+protected slots:
+  virtual void Idle();
+
 protected:
   VboTorus* _torus;
+  float _angle;
 };

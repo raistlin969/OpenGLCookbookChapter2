@@ -35,8 +35,8 @@ VboTorus::VboTorus(float outer_radius, float inner_radius, int num_sides, int nu
   glBindBuffer(GL_ARRAY_BUFFER, handle[2]);
   glBufferData(GL_ARRAY_BUFFER, (2 * num_verts) * sizeof(float), tex, GL_STATIC_DRAW);
 
-  glBindBuffer(GL_ARRAY_BUFFER, handle[4]);
-  glBufferData(GL_ARRAY_BUFFER, (6 * _faces) * sizeof(unsigned int), el, GL_STATIC_DRAW);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle[3]);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, (6 * _faces) * sizeof(unsigned int), el, GL_STATIC_DRAW);
 
   delete[] v;
   delete[] n;
