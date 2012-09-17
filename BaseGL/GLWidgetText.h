@@ -1,16 +1,9 @@
 #pragma once
 
 #include "GLWidget.h"
-#include <ft2build.h>
-#include FT_FREETYPE_H
+#include "Text.h"
+#include "VboTorus.h"
 
-struct Point
-{
-  GLfloat x;
-  GLfloat y;
-  GLfloat s;
-  GLfloat t;
-};
 
 class GLWidgetText : public GLWidget
 {
@@ -25,19 +18,13 @@ protected:
   virtual void resizeGL(int w, int h);
   virtual void paintGL();
 
-  void RenderText(const char* text, float x, float y, float sx, float sy);
-  inline int NextP2(int a)
-  {
-    int rval = 1;
-    while(rval < a)
-      rval <<= 1;
-    return rval;
-  }
+  virtual void SetMatrices();
 
-protected:
-  FT_GlyphSlot _g;
-  FT_Library _ft;
-  FT_Face _face;
+  Text* _text;
+  GLSLProgram _text_program;
+  GLSLProgram _ads;
+  VboTorus* _torus;
+  float _angle;
 
 protected slots:
   virtual void Idle();

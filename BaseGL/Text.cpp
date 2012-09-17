@@ -2,8 +2,12 @@
 #include <boost/log/trivial.hpp>
 #include <GL/glew.h>
 #include "Logger.h"
+#include <glm/glm.hpp>
+#include "GLSLProgram.h"
 
-Text::Text()
+using glm::vec4;
+
+Text::Text(GLSLProgram* p) : _program(p)
 {
   if(FT_Init_FreeType(&_ft))
   {
@@ -13,6 +17,10 @@ Text::Text()
   {
     BOOST_LOG_SEV(get_global_log(), error) << "Could not open font";
   }
+
+  FT_Set_Pixel_Sizes(_face, 0, 12);
+
+
   glGenVertexArrays(1, &_vao);
   glBindVertexArray(_vao);
 }
@@ -21,7 +29,7 @@ Text::~Text()
 {
 }
 
-void Text::Render(const char* text, float x, float y, float sx, float sy)
+void Text::Render(const char* text, float x, float y, float sx, float sy, vec4& color)
 {
   const char* p;
   FT_GlyphSlot g = _face->glyph;
@@ -29,11 +37,12 @@ void Text::Render(const char* text, float x, float y, float sx, float sy)
   glActiveTexture(GL_TEXTURE0);
   glGenTextures(1, &tex);
   glBindTexture(GL_TEXTURE_2D, tex);
-  GLint loc = glGetUniformLocation(_program.Handle(), "tex");
+  GLint loc = glGetUniformLocation(_program->Handle(), "tex");
   if(loc >= 0)
     glUniform1i(loc, 0);
   else
     BOOST_LOG_SEV(get_global_log(), error) << "Uniform tex not found";
+  _program->SetUniform("color", color);
 
   glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
