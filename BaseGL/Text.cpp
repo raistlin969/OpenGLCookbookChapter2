@@ -22,7 +22,7 @@ Text::Text(GLSLProgram* p) : _program(p)
 
 
   glGenVertexArrays(1, &_vao);
-  glBindVertexArray(_vao);
+  //glBindVertexArray(_vao);
 }
 
 Text::~Text()
@@ -34,6 +34,7 @@ void Text::Render(const char* text, float x, float y, float sx, float sy, vec4& 
   const char* p;
   FT_GlyphSlot g = _face->glyph;
   GLuint tex;
+  glBindVertexArray(_vao);
   glActiveTexture(GL_TEXTURE0);
   glGenTextures(1, &tex);
   glBindTexture(GL_TEXTURE_2D, tex);
@@ -52,7 +53,7 @@ void Text::Render(const char* text, float x, float y, float sx, float sy, vec4& 
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
   glEnableVertexAttribArray(0);
-  glBindBuffer(GL_ARRAY_BUFFER, _vao);
+  //glBindBuffer(GL_ARRAY_BUFFER, _vao);
   glVertexAttribPointer(0, 4, GL_FLOAT, GL_FALSE, 0, 0);
   for(p = text; *p; p++)
   {
@@ -91,6 +92,7 @@ void Text::Render(const char* text, float x, float y, float sx, float sy, vec4& 
     x += (g->advance.x >> 6) * sx;
     y += (g->advance.y >> 6) * sy;
   }
-  glDisableVertexAttribArray(0);
+//  glDisableVertexAttribArray(0);
+  glBindVertexArray(0);
   glDeleteTextures(1, &tex);
 }

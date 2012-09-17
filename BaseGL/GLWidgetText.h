@@ -26,6 +26,10 @@ protected:
   VboTorus* _torus;
   float _angle;
 
+  int _width;
+  int _height;
+  unsigned int _frames;
+
 protected slots:
   virtual void Idle();
 };

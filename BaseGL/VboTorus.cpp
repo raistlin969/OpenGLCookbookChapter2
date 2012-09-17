@@ -8,22 +8,22 @@
 VboTorus::VboTorus(float outer_radius, float inner_radius, int num_sides, int num_rings) : _rings(num_rings), _sides(num_sides)
 {
   _faces = _sides * _rings;
-  num_verts = _sides * (_rings+1);
+  int num_verts = _sides * (_rings+1);
 
   //verts
-  v = new float[3 * num_verts];
+  float* v = new float[3 * num_verts];
   //normals
-  n = new float[3 * num_verts];
+  float* n = new float[3 * num_verts];
   //tex coords
-  tex = new float[2 * num_verts];
+  float* tex = new float[2 * num_verts];
   //elements
-  el = new unsigned int[6 * _faces];
+  unsigned int* el = new unsigned int[6 * _faces];
 
   //genertate vertex data
   GenerateVerts(v, n, tex, el, outer_radius, inner_radius);
 
   //create and populate buffers
-  //unsigned int handle[4];
+  unsigned int handle[4];
   glGenBuffers(4, handle);
 
   glBindBuffer(GL_ARRAY_BUFFER, handle[0]);
@@ -38,10 +38,10 @@ VboTorus::VboTorus(float outer_radius, float inner_radius, int num_sides, int nu
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle[3]);
   glBufferData(GL_ELEMENT_ARRAY_BUFFER, (6 * _faces) * sizeof(unsigned int), el, GL_STATIC_DRAW);
 
-//  delete[] v;
-//  delete[] n;
-//  delete[] tex;
-//  delete[] el;
+  delete[] v;
+  delete[] n;
+  delete[] tex;
+  delete[] el;
 
   //create vao
   glGenVertexArrays(1, &_vao);
@@ -66,30 +66,8 @@ VboTorus::VboTorus(float outer_radius, float inner_radius, int num_sides, int nu
 
 void VboTorus::Render()
 {
-  //create vao
   glBindVertexArray(_vao);
-
-  glEnableVertexAttribArray(0);
-  glBindBuffer(GL_ARRAY_BUFFER, handle[0]);
-  glVertexAttribPointer((GLuint)0, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-
-  glEnableVertexAttribArray(1);
-  glBindBuffer(GL_ARRAY_BUFFER, handle[1]);
-  glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, NULL);
-
-  glEnableVertexAttribArray(2);
-  glBindBuffer(GL_ARRAY_BUFFER, handle[2]);
-  glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 0, NULL);
-
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, handle[3]);
-
   glDrawElements(GL_TRIANGLES, 6 * _faces, GL_UNSIGNED_INT, NULL);
-  glBindVertexArray(0);
-}
-
-void VboTorus::Bind()
-{
-  glBindVertexArray(_vao);
 }
 
 void VboTorus::GenerateVerts(float* verts, float* norms, float* tex, unsigned int* el, float outer_radius, float inner_radius)
