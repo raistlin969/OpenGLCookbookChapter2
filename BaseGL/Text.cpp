@@ -18,7 +18,7 @@ Text::Text(GLSLProgram* p) : _program(p)
     BOOST_LOG_SEV(get_global_log(), error) << "Could not open font";
   }
 
-  FT_Set_Pixel_Sizes(_face, 0, 12);
+  FT_Set_Pixel_Sizes(_face, 0, 24);
 
 
   glGenVertexArrays(1, &_vao);
