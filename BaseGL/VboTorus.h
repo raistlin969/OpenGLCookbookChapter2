@@ -5,7 +5,6 @@
 class VboTorus : public Drawable
 {
 private:
-  unsigned int _vao;
   int _faces;
   int _rings;
   int _sides;

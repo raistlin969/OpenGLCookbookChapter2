@@ -25,9 +25,9 @@ void GLWidgetText::initializeGL()
   _text = new Text(&_text_program);
 
   _torus = new VboTorus(0.7f, 0.3f, 50, 50);
-  _model = mat4(1.0);
-  _model *= glm::rotate(-35.0f, vec3(1.0f, 0.0f, 0.0f));
-  _model *= glm::rotate(35.0f, vec3(0.0f, 1.0f, 0.0f));
+  _torus->Model(mat4(1.0));
+  _torus->Rotate(-35.0f, vec3(1.0f, 0.0f, 0.0f));
+  _torus->Rotate(35.0f, vec3(0.0f, 1.0f, 0.0f));
   _view = glm::lookAt(vec3(0.0f, 0.0f, 2.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
   _projection = mat4(1.0f);
   vec4 world_light = vec4(5.0f, 5.0f, 2.0f, 1.0f);
@@ -55,10 +55,10 @@ void GLWidgetText::paintGL()
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
   _ads.Use();
-  _model = mat4(1.0);
-  _model *= glm::rotate(_angle, vec3(0.0f, 1.0f, 0.0f));
-  _model *= glm::rotate(-35.0f, vec3(1.0f, 0.0f, 0.0f));
-  _model *= glm::rotate(35.0f, vec3(0.0f, 1.0f, 0.0f));
+  _torus->Model(mat4(1.0));
+  _torus->Rotate(_angle, vec3(0.0f, 1.0f, 0.0f));
+  _torus->Rotate(-35.0f, vec3(1.0f, 0.0f, 0.0f));
+  _torus->Rotate(35.0f, vec3(0.0f, 1.0f, 0.0f));
   SetMatrices();
   _torus->Render();
   glUseProgram(0);
@@ -88,7 +88,7 @@ void GLWidgetText::Idle()
 
 void GLWidgetText::SetMatrices()
 {
-  glm::mat4 mv = _view * _model;
+  glm::mat4 mv = _view * _torus->Model();
   _ads.SetUniform("model_view_matrix", mv);
   _ads.SetUniform("normal_matrix", mat3(vec3(mv[0]), vec3(mv[1]), vec3(mv[2])));
   _ads.SetUniform("mvp", _projection * mv);
