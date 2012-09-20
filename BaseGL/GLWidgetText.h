@@ -3,7 +3,7 @@
 #include "GLWidget.h"
 #include "Text.h"
 #include "VboTorus.h"
-
+#include "VboTeapot.h"
 
 class GLWidgetText : public GLWidget
 {
@@ -24,6 +24,7 @@ protected:
   GLSLProgram _text_program;
   GLSLProgram _ads;
   VboTorus* _torus;
+  VBOTeapot* _tea;
   float _angle;
 
   int _width;

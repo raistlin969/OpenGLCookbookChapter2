@@ -83,6 +83,9 @@
     <ClCompile Include="Drawable.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="VboTeapot.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="GLWidget.h">
@@ -121,6 +124,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Text.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TeapotData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VboTeapot.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
