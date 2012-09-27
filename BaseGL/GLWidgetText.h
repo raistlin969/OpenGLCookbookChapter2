@@ -4,6 +4,7 @@
 #include "Text.h"
 #include "VboTorus.h"
 #include "VboTeapot.h"
+#include "Camera.h"
 
 class GLWidgetText : public GLWidget
 {
@@ -17,7 +18,7 @@ protected:
   virtual void initializeGL();
   virtual void resizeGL(int w, int h);
   virtual void paintGL();
-
+  virtual void keyPressEvent(QKeyEvent* e);
   virtual void SetMatrices();
 
   Text* _text;
@@ -26,7 +27,7 @@ protected:
   VboTorus* _torus;
   VBOTeapot* _tea;
   float _angle;
-
+  Camera _camera;
   int _width;
   int _height;
   unsigned int _frames;

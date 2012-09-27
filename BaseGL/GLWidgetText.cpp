@@ -2,6 +2,8 @@
 #include <sstream>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform2.hpp>
+#include <QtCore/qcoreapplication.h>
+
 #include FT_GLYPH_H
 
 GLWidgetText::GLWidgetText(const QGLFormat& format, QWidget* parent)
@@ -19,7 +21,7 @@ void GLWidgetText::initializeGL()
 {
   GLWidget::initializeGL();
   _text_program.CompileAndLinkShaders("text_vert.glsl", "text_frag.glsl");
-  _ads.CompileAndLinkShaders("discard_vert.glsl", "discard_frag.glsl");
+  _ads.CompileAndLinkShaders("front_back_vert.glsl", "front_back_frag.glsl");
   glClearColor(0.0, 0.0, 0.0, 1.0);
   glEnable(GL_DEPTH_TEST);
   _text = new Text(&_text_program);
@@ -27,13 +29,14 @@ void GLWidgetText::initializeGL()
   _torus = new VboTorus(0.7f, 0.3f, 50, 50);
   _torus->Program(&_ads);
   _torus->Model(mat4(1.0));
-  _torus->Rotate(-35.0f, vec3(1.0f, 0.0f, 0.0f));
-  _torus->Rotate(35.0f, vec3(0.0f, 1.0f, 0.0f));
-
+  //_torus->Rotate(-35.0f, vec3(1.0f, 0.0f, 0.0f));
+  //_torus->Rotate(35.0f, vec3(0.0f, 1.0f, 0.0f));
+  _torus->SetPosition(glm::vec3(0.0, 0.0, 0.0));
   mat4 transform = glm::translate(mat4(1.0f), vec3(0.0f, 1.5f, 0.25f));
   _tea = new VBOTeapot(13, transform);
-  _view = glm::lookAt(vec3(2.0f, 4.0f, 2.0f), vec3(0.0f, 0.0f, 0.0f), vec3(0.0f, 1.0f, 0.0f));
-  _projection = mat4(1.0f);
+  //_tea->Translate(glm::vec3(-5.0f, 0.0f, 0.0f));
+  _view = _camera.View();
+  _projection = _camera.Projection();
   vec4 world_light = vec4(5.0f, 5.0f, 2.0f, 1.0f);
 
   _ads.SetUniform("material.kd", 0.9f, 0.5f, 0.3f);
@@ -59,23 +62,30 @@ void GLWidgetText::paintGL()
   glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
   glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
   _ads.Use();
-  //_torus->Model(mat4(1.0));
-  //_torus->Rotate(_angle, vec3(0.0f, 1.0f, 0.0f));
-  //_torus->Rotate(-35.0f, vec3(1.0f, 0.0f, 0.0f));
-  //_torus->Rotate(35.0f, vec3(0.0f, 1.0f, 0.0f));
-  //SetMatrices();
-  //_torus->Render();
+  _torus->Model(mat4(1.0));
+  _torus->Rotate(1.0f, vec3(1.0f, 1.0f, 1.0f));
+//  _torus->Rotate(-35.0f, vec3(1.0f, 0.0f, 0.0f));
+//  _torus->Rotate(35.0f, vec3(0.0f, 1.0f, 0.0f));
+//  _torus->Translate(vec3(-1.0, 0.0, 0.0));
+  //_torus->Move(glm::vec3(0.01, 0.0, 0.0));
+  //mat4 rot = glm::rotate(-35.0f, vec3(1.0f, 0.0f, 0.0f));
+  //rot *= glm::rotate(35.0f, vec3(0.0f, 1.0f, 0.0f));
+  //mat4 tran = glm::translate(mat4(1.0f), vec3(-1.0, 0.0, 0.0));
+  //_torus->Model(tran * rot);
+  SetMatrices();
+  _torus->Render();
 
   vec4 world_light = vec4(2.0f, 4.0f, 2.0f, 1.0f);
   mat4 model = glm::rotate(_angle, vec3(0.0f, 1.0f, 0.0f));
   _ads.SetUniform("light.position", _view * model * world_light);
 
-  model = mat4(1.0f);
-  model *= glm::translate(vec3(0.0f, -1.0f, 0.0f));
-  _tea->Model(model);
-  _tea->Rotate(-90.0f, vec3(1.0f, 0.0f, 0.0f)); 
-  SetMatrices();
-  _tea->Render();
+  //model = mat4(1.0f);
+  //model *= glm::translate(vec3(0.0f, -1.0f, 0.0f));
+  //_tea->Model(model);
+  //_tea->Translate(glm::vec3(5.0f, 0.0f, 0.0f));
+  //_tea->Rotate(-90.0f, vec3(1.0f, 0.0f, 0.0f)); 
+  //SetMatrices();
+  //_tea->Render();
   glUseProgram(0);
   float sx = 2.0 / this->width();
   float sy = 2.0 / this->height();
@@ -95,17 +105,53 @@ void GLWidgetText::paintGL()
 
 void GLWidgetText::Idle()
 {
-  //_angle += 1.0f;
-  //if(_angle > 360.0)
-  //  _angle -= 360.0;
+  _angle += 1.0f;
+  if(_angle > 360.0)
+    _angle -= 360.0;
 
   updateGL();
 }
 
 void GLWidgetText::SetMatrices()
 {
-  glm::mat4 mv = _view * _tea->Model();
+  glm::mat4 mv = _camera.View() * _torus->Model();
   _ads.SetUniform("model_view_matrix", mv);
   _ads.SetUniform("normal_matrix", mat3(vec3(mv[0]), vec3(mv[1]), vec3(mv[2])));
   _ads.SetUniform("mvp", _projection * mv);
+}
+
+void GLWidgetText::keyPressEvent( QKeyEvent* e )
+{
+  switch ( e->key() )
+  {
+    case Qt::Key_Escape:
+      QCoreApplication::instance()->quit();
+        break;
+    case Qt::Key::Key_A:
+      _camera.StrafeLeft();
+      break;
+    case Qt::Key::Key_D:
+      _camera.StrafeRight();
+      break;
+    case Qt::Key::Key_W:
+      _camera.MoveForward();
+      break;
+    case Qt::Key::Key_S:
+      _camera.MoveBack();
+      break;
+    case Qt::Key::Key_Q:
+      _camera.DeltaBearing(-0.1f);
+      break;
+    case Qt::Key::Key_E:
+      _camera.DeltaBearing(0.1f);
+      break;
+    case Qt::Key::Key_Z:
+      _camera.DeltaPitch(-0.1f);
+      break;
+    case Qt::Key::Key_C:
+      _camera.DeltaPitch(0.1f);
+      break;
+    default:
+      QGLWidget::keyPressEvent( e );
+    }
 }
